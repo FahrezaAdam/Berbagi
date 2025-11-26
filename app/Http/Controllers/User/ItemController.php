@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Item;
 use App\Models\Category;
+use Illuminate\Support\Str;
 
 class ItemController extends Controller
 {
     public function index()
     {
-        // Barang saya → tampilkan semua barang milik user
         $items = Item::where('user_id', auth()->id())->paginate(9);
         return view('user.items.index', compact('items'));
     }
@@ -33,7 +33,6 @@ class ItemController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            // simpan konsisten ke storage/app/public/items
             $data['foto'] = $request->file('foto')->store('items', 'public');
         }
 
@@ -43,6 +42,14 @@ class ItemController extends Controller
         Item::create($data);
 
         return redirect()->route('user.dashboard')->with('success', 'Barang berhasil dikirim!');
+    }
+
+    public function show($id)
+    {
+        $item = Item::findOrFail($id);
+        $this->authorizeOwnership($item);
+
+        return view('user.items.show', compact('item'));
     }
 
     public function edit($id)
@@ -70,8 +77,10 @@ class ItemController extends Controller
         $data = $req->only(['nama_barang', 'kategori', 'kondisi', 'deskripsi']);
 
         if ($req->hasFile('foto')) {
-            // konsisten dengan store()
-            $data['foto'] = $req->file('foto')->store('items', 'public');
+            $name = time() . '_' . Str::random(6) . '.' . $req->file('foto')->getClientOriginalExtension();
+            $req->file('foto')->storeAs('public/items', $name);
+
+            $data['foto'] = 'items/' . $name;
         }
 
         $item->update($data);
