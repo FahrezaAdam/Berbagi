@@ -10,44 +10,65 @@ use Illuminate\Support\Str;
 
 class ItemController extends Controller
 {
+    // ========================================================
+    // LIST BARANG USER
+    // ========================================================
     public function index()
     {
-        // Tampilkan semua item milik user yang login
         $items = Item::where('user_id', auth()->id())->paginate(10);
         return view('user.items.index', compact('items'));
     }
 
+    // ========================================================
+    // FORM TAMBAH BARANG
+    // ========================================================
     public function create()
     {
         $categories = Category::all();
         return view('user.items.create', compact('categories'));
     }
 
-    public function store(Request $req)
+    // ========================================================
+    // SIMPAN BARANG
+    // ========================================================
+    public function store(Request $request)
     {
-        $req->validate([
+        $data = $request->validate([
             'nama_barang' => 'required',
             'kategori' => 'required',
             'kondisi' => 'required',
-            'foto' => 'nullable|image|max:2048'
+            'deskripsi' => 'nullable',
+            'foto' => 'nullable|image',
         ]);
 
-        $data = $req->only(['nama_barang', 'kategori', 'kondisi', 'deskripsi']);
-        $data['user_id'] = auth()->id(); // default user
-
-        // Upload foto
-        if ($req->hasFile('foto')) {
-            $file = $req->file('foto');
-            $name = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/items', $name);
-            $data['foto'] = 'storage/items/' . $name;
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('uploads/items', 'public');
         }
+
+        $data['user_id'] = auth()->id();
+        $data['status'] = 'pending';
 
         Item::create($data);
 
-        return redirect()->route('user.items.index')->with('success', 'Barang berhasil disimpan');
+        return redirect()
+            ->route('user.items.index')
+            ->with('success', 'Barang berhasil dikirim!');
     }
 
+    // ========================================================
+    // TAMPIL DETAIL BARANG (SHOW)
+    // ========================================================
+    public function show($id)
+    {
+        $item = Item::findOrFail($id);
+        $this->authorizeOwnership($item);
+
+        return view('user.items.show', compact('item'));
+    }
+
+    // ========================================================
+    // FORM EDIT BARANG
+    // ========================================================
     public function edit($id)
     {
         $item = Item::findOrFail($id);
@@ -57,6 +78,9 @@ class ItemController extends Controller
         return view('user.items.edit', compact('item', 'categories'));
     }
 
+    // ========================================================
+    // UPDATE BARANG
+    // ========================================================
     public function update(Request $req, $id)
     {
         $item = Item::findOrFail($id);
@@ -66,23 +90,31 @@ class ItemController extends Controller
             'nama_barang' => 'required',
             'kategori' => 'required',
             'kondisi' => 'required',
+            'deskripsi' => 'nullable',
             'foto' => 'nullable|image|max:2048'
         ]);
 
         $data = $req->only(['nama_barang', 'kategori', 'kondisi', 'deskripsi']);
 
+        // Jika ada foto baru
         if ($req->hasFile('foto')) {
             $file = $req->file('foto');
             $name = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
             $file->storeAs('public/items', $name);
+
             $data['foto'] = 'storage/items/' . $name;
         }
 
         $item->update($data);
 
-        return redirect()->route('user.items.index')->with('success', 'Barang berhasil diperbarui');
+        return redirect()
+            ->route('user.items.index')
+            ->with('success', 'Barang berhasil diperbarui');
     }
 
+    // ========================================================
+    // HAPUS BARANG
+    // ========================================================
     public function destroy($id)
     {
         $item = Item::findOrFail($id);
@@ -93,6 +125,9 @@ class ItemController extends Controller
         return back()->with('success', 'Barang berhasil dihapus');
     }
 
+    // ========================================================
+    // VALIDASI PEMILIK ITEM
+    // ========================================================
     private function authorizeOwnership($item)
     {
         if ($item->user_id != auth()->id()) {

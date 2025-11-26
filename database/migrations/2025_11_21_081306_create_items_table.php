@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->string('kondisi');
             $table->text('deskripsi')->nullable();
             $table->string('foto')->nullable();
-            $table->enum('status', ['menunggu','tersedia','diproses','selesai'])->default('menunggu');
+            $table->enum('status', ['pending','approved','rejected'])->default('pending');
 
             // user_id digunakan karena role sudah admin/user
             $table->foreignId('user_id')

@@ -69,7 +69,7 @@
             <ul class="navbar-nav ms-auto">
 
                 <li class="nav-item me-3">
-                    <a href="{{ route('user.items.create') }}" class="nav-link fw-semibold">
+                    <a href="{{ route('user.items.index') }}" class="nav-link fw-semibold">
                         ➕ Tambah Barang
                     </a>
                 </li>

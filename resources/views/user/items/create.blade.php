@@ -23,26 +23,30 @@
 
                         <div class="mb-3">
                             <label class="form-label">Nama Barang</label>
-                            <input name="nama_barang" class="form-control" required>
+                            <input name="nama_barang" class="form-control" value="{{ old('nama_barang') }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Kategori</label>
                             <select name="kategori" class="form-control" required>
-                                @foreach($categories as $c)
-                                    <option value="{{ $c->nama_kategori }}">{{ $c->nama_kategori }}</option>
+                                <option value="">-- Pilih Kategori --</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->nama_kategori ?? $cat->nama }}"
+                                        {{ old('kategori') == ($cat->nama_kategori ?? $cat->nama) ? 'selected' : '' }}>
+                                        {{ $cat->nama_kategori ?? $cat->nama }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Kondisi</label>
-                            <input name="kondisi" class="form-control" required>
+                            <input name="kondisi" class="form-control" value="{{ old('kondisi') }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Deskripsi</label>
-                            <textarea name="deskripsi" class="form-control" rows="3"></textarea>
+                            <textarea name="deskripsi" class="form-control" rows="3">{{ old('deskripsi') }}</textarea>
                         </div>
 
                         <div class="mb-3">
@@ -50,7 +54,9 @@
                             <input type="file" name="foto" class="form-control">
                         </div>
 
-                        <button class="btn btn-primary w-100">Simpan</button>
+                        <!-- 🔥 Perbaikan: Simpan -> Kirim -->
+                        <button class="btn btn-primary w-100">Kirim</button>
+
                     </form>
 
                 </div>
