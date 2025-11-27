@@ -123,7 +123,7 @@
                 </li>
 
                 <li class="nav-item me-3">
-                    <a href="{{ route('user.requests.index') }}" class="nav-link fw-semibold position-relative">
+                    <a href="{{ route('user.inbox.index') }}" class="nav-link fw-semibold position-relative">
                         📥 Inbox
                         @php
                             $jumlahInbox = \App\Models\Request::where('user_id', auth()->id())->count();
@@ -187,7 +187,9 @@
                 <div class="card-body">
                     <h5 class="fw-bold">{{ $item->nama }}</h5>
 
-                    <span class="kategori-text">{{ $item->kategori }}</span>
+                    <span class="kategori-text">
+                        {{ $item->category->nama_kategori ?? 'Tidak ada kategori' }}
+                    </span>                    
 
                     <a href="{{ route('user.items.index', $item->id) }}"
                        class="btn btn-purple w-100 mt-3">

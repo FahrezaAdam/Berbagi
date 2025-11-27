@@ -28,16 +28,16 @@
 
                         <div class="mb-3">
                             <label class="form-label">Kategori</label>
-                            <select name="kategori" class="form-control" required>
+                            <select name="category_id" class="form-control" required>
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach($categories as $cat)
-                                    <option value="{{ $cat->nama_kategori ?? $cat->nama }}"
-                                        {{ old('kategori') == ($cat->nama_kategori ?? $cat->nama) ? 'selected' : '' }}>
-                                        {{ $cat->nama_kategori ?? $cat->nama }}
+                                    <option value="{{ $cat->id }}"
+                                        {{ old('category_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->nama_kategori }}
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div>                        
 
                         <div class="mb-3">
                             <label class="form-label">Kondisi</label>
@@ -46,8 +46,9 @@
 
                         <div class="mb-3">
                             <label class="form-label">Deskripsi</label>
+                            <p class="text-danger">Jangan lupa memberikan Nama dan No Telefon</p>
                             <textarea name="deskripsi" class="form-control" rows="3">{{ old('deskripsi') }}</textarea>
-                        </div>
+                        </div>                        
 
                         <div class="mb-3">
                             <label class="form-label">Foto</label>

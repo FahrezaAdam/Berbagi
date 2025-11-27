@@ -10,40 +10,58 @@ use Illuminate\Support\Str;
 
 class ItemController extends Controller
 {
+    // =============================
+    // LIST DATA USER
+    // =============================
     public function index()
     {
         $items = Item::where('user_id', auth()->id())->paginate(9);
         return view('user.items.index', compact('items'));
     }
 
+    // =============================
+    // FORM TAMBAH
+    // =============================
     public function create()
     {
         $categories = Category::all();
         return view('user.items.create', compact('categories'));
     }
 
+    // =============================
+    // PROSES TAMBAH BARANG
+    // =============================
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'nama_barang' => 'required',
-            'kategori' => 'required',
+            'deskripsi' => 'required',
             'kondisi' => 'required',
-            'deskripsi' => 'nullable',
+            'category_id' => 'required',   // wajib
             'foto' => 'nullable|image|max:3072'
         ]);
 
+        $item = new Item();
+        $item->nama_barang = $request->nama_barang;
+        $item->deskripsi = $request->deskripsi;
+        $item->kondisi = $request->kondisi;
+        $item->category_id = $request->category_id;
+        $item->user_id = auth()->id();    // wajib → memperbaiki error not null
+
+        // upload foto
         if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('items', 'public');
+            $item->foto = $request->file('foto')->store('items', 'public');
         }
 
-        $data['user_id'] = auth()->id();
-        $data['status'] = 'pending';
+        $item->status = 'pending';
+        $item->save();
 
-        Item::create($data);
-
-        return redirect()->route('user.dashboard')->with('success', 'Barang berhasil dikirim!');
+        return redirect()->back()->with('success', 'Barang berhasil ditambahkan!');
     }
 
+    // =============================
+    // DETAIL ITEM USER
+    // =============================
     public function show($id)
     {
         $item = Item::findOrFail($id);
@@ -52,6 +70,9 @@ class ItemController extends Controller
         return view('user.items.show', compact('item'));
     }
 
+    // =============================
+    // FORM EDIT
+    // =============================
     public function edit($id)
     {
         $item = Item::findOrFail($id);
@@ -61,6 +82,9 @@ class ItemController extends Controller
         return view('user.items.edit', compact('item', 'categories'));
     }
 
+    // =============================
+    // PROSES UPDATE BARANG
+    // =============================
     public function update(Request $req, $id)
     {
         $item = Item::findOrFail($id);
@@ -68,18 +92,17 @@ class ItemController extends Controller
 
         $req->validate([
             'nama_barang' => 'required',
-            'kategori' => 'required',
+            'category_id' => 'required',
             'kondisi' => 'required',
             'deskripsi' => 'nullable',
             'foto' => 'nullable|image|max:3072'
         ]);
 
-        $data = $req->only(['nama_barang', 'kategori', 'kondisi', 'deskripsi']);
+        $data = $req->only(['nama_barang', 'category_id', 'kondisi', 'deskripsi']);
 
         if ($req->hasFile('foto')) {
             $name = time() . '_' . Str::random(6) . '.' . $req->file('foto')->getClientOriginalExtension();
             $req->file('foto')->storeAs('public/items', $name);
-
             $data['foto'] = 'items/' . $name;
         }
 
@@ -88,6 +111,9 @@ class ItemController extends Controller
         return redirect()->route('user.dashboard')->with('success', 'Barang berhasil diperbarui');
     }
 
+    // =============================
+    // DELETE BARANG
+    // =============================
     public function destroy($id)
     {
         $item = Item::findOrFail($id);
@@ -98,6 +124,9 @@ class ItemController extends Controller
         return redirect()->route('user.dashboard')->with('success', 'Barang berhasil dihapus');
     }
 
+    // =============================
+    // CEK PEMILIK
+    // =============================
     private function authorizeOwnership($item)
     {
         if ($item->user_id != auth()->id()) {

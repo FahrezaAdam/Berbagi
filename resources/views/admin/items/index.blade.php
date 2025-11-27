@@ -35,7 +35,7 @@
                     <td>{{ $item->kondisi }}</td>
 
                     {{-- KATEGORI --}}
-                    <td>{{ $item->kategori->nama ?? '-' }}</td>
+                    <td>{{ $item->category->nama_kategori ?? '-' }}</td>
 
                     {{-- FOTO --}}
                     <td>

@@ -8,13 +8,13 @@ class Item extends Model
 {
     protected $fillable = [
         'nama_barang',
-        'kategori',
-        'kondisi',
         'deskripsi',
+        'kondisi',
+        'category_id',
         'foto',
         'status',
-        'user_id'
-    ];
+        'user_id',
+    ];    
 
     public function user()
     {
@@ -23,6 +23,7 @@ class Item extends Model
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+    return $this->belongsTo(Category::class, 'category_id');
     }
+   
 }

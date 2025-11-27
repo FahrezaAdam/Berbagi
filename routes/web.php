@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\User\DashboardUserController;
 use App\Http\Controllers\User\ItemController;
 use App\Http\Controllers\User\RequestController;
+use App\Http\Controllers\User\InboxController;
 
 use App\Http\Controllers\AgreementController;
 
@@ -74,26 +75,21 @@ Route::middleware(['auth', 'role:admin'])
             ->name('dashboard');
 
         // Manajemen Barang (ACC / REJECT)
-        Route::get('/items', [ItemAdminController::class, 'index'])
-            ->name('items.index');
-
-        Route::post('/items/acc/{id}', [ItemAdminController::class, 'acc'])
-            ->name('items.acc');
-
-        Route::post('/items/reject/{id}', [ItemAdminController::class, 'reject'])
-            ->name('items.reject');
+        Route::get('/items', [ItemAdminController::class, 'index'])->name('items.index');
+        Route::post('/items/acc/{id}', [ItemAdminController::class, 'acc'])->name('items.acc');
+        Route::post('/items/reject/{id}', [ItemAdminController::class, 'reject'])->name('items.reject');
 
         // Riwayat Barang
-        Route::get('/history', [HistoryController::class, 'index'])
-            ->name('history.index');
+        Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
 
-        // Category Routes
+        // Kategori
         Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
         Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
         Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');
         Route::get('/categories/{id}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
         Route::post('/categories/{id}/update', [CategoryController::class, 'update'])->name('categories.update');
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+        
     });
 
 
@@ -106,21 +102,24 @@ Route::middleware(['auth', 'role:user'])
     ->group(function () {
 
         // Dashboard user
-        Route::get('/dashboard', [DashboardUserController::class, 'index'])
-            ->name('dashboard');
+        Route::get('/dashboard', [DashboardUserController::class, 'index'])->name('dashboard');
 
-        // Donasi barang
-        Route::get('/items', [ItemController::class, 'index'])->name('items.index');      // list
-        Route::get('/items/create', [ItemController::class, 'create'])->name('items.create'); // form tambah
-        Route::post('/items', [ItemController::class, 'store'])->name('items.store');     // simpan
-        Route::get('/items/{id}/edit', [ItemController::class, 'edit'])->name('items.edit'); // form edit
-        Route::post('/items/{id}/update', [ItemController::class, 'update'])->name('items.update'); // update
-        Route::delete('/items/{id}', [ItemController::class, 'destroy'])->name('items.destroy'); // hapus
+        // Donasi / Item User
+        Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+        Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
+        Route::post('/items', [ItemController::class, 'store'])->name('items.store');
+        Route::get('/items/{id}/edit', [ItemController::class, 'edit'])->name('items.edit');
+        Route::post('/items/{id}/update', [ItemController::class, 'update'])->name('items.update');
+        Route::delete('/items/{id}', [ItemController::class, 'destroy'])->name('items.destroy');
         Route::get('/items/{id}', [ItemController::class, 'show'])->name('items.show');
 
-        // Request barang
+        // Request barang user
         Route::resource('requests', RequestController::class)
             ->only(['index', 'create', 'store', 'destroy']);
+
+        // INBOX USER
+        Route::get('/inbox', [InboxController::class, 'index'])->name('inbox.index');
+        Route::get('/inbox/{id}', [InboxController::class, 'show'])->name('inbox.show');
     });
 
 
@@ -129,15 +128,11 @@ Route::middleware(['auth', 'role:user'])
 // ============================
 Route::middleware('auth')->group(function () {
 
-    Route::get('agreements', [AgreementController::class, 'index'])
-        ->name('agreements.index');
+    Route::get('agreements', [AgreementController::class, 'index'])->name('agreements.index');
 
-    Route::get('agreements/create/{requestId}', [AgreementController::class, 'create'])
-        ->name('agreements.create');
+    Route::get('agreements/create/{requestId}', [AgreementController::class, 'create'])->name('agreements.create');
 
-    Route::post('agreements/store/{requestId}', [AgreementController::class, 'store'])
-        ->name('agreements.store');
+    Route::post('agreements/store/{requestId}', [AgreementController::class, 'store'])->name('agreements.store');
 
-    Route::delete('agreements/{id}', [AgreementController::class, 'destroy'])
-        ->name('agreements.destroy');
+    Route::delete('agreements/{id}', [AgreementController::class, 'destroy'])->name('agreements.destroy');
 });
