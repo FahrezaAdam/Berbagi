@@ -106,6 +106,24 @@
                         ➕ Tambah Barang
                     </a>
                 </li>
+                <li class="nav-item me-3">
+                    <a href="{{ route('user.inbox.index') }}" class="nav-link fw-semibold position-relative">
+                        📥 Inbox
+                        @php
+                            $jumlahInbox = \App\Models\Request::where('user_id', auth()->id())->count();
+                        @endphp
+                        @if($jumlahInbox > 0)
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                            {{ $jumlahInbox }}
+                        </span>
+                        @endif
+                    </a>
+                </li>
+                <li class="nav-item me-3">
+                    <a href="{{ route('user.tip.index') }}" class="nav-link fw-semibold">
+                        💷 Beri Tip
+                    </a>
+                </li>
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle fw-semibold" data-bs-toggle="dropdown">
@@ -196,8 +214,7 @@
                     class="product-img">
 
                 <div class="card-body">
-                    <h5 class="fw-bold">{{ $item->nama }}</h5>
-
+                    <h5 class="fw-bold">{{ $item->nama_barang }}</h5>
                     <span class="kategori-text">
                         {{ $item->category->nama_kategori ?? 'Tidak ada kategori' }}
                     </span>

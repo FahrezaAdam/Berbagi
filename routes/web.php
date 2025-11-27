@@ -8,12 +8,14 @@ use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\ItemAdminController;
 use App\Http\Controllers\Admin\HistoryController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\TipAdminController; // ← WAJIB
 
 // USER
 use App\Http\Controllers\User\DashboardUserController;
 use App\Http\Controllers\User\ItemController;
 use App\Http\Controllers\User\RequestController;
 use App\Http\Controllers\User\InboxController;
+use App\Http\Controllers\User\TipUserController;   // ← WAJIB
 
 // AGREEMENTS
 use App\Http\Controllers\AgreementController;
@@ -75,6 +77,8 @@ Route::middleware(['auth', 'role:admin'])
 
         // Categories
         Route::resource('categories', CategoryController::class);
+
+        Route::get('/tip', [TipAdminController::class, 'index'])->name('tip.index');
     });
 
 
@@ -99,6 +103,10 @@ Route::middleware(['auth', 'role:user'])
         // Inbox
         Route::get('/inbox', [InboxController::class, 'index'])->name('inbox.index');
         Route::get('/inbox/{id}', [InboxController::class, 'show'])->name('inbox.show');
+
+        Route::get('/tip', [TipUserController::class, 'index'])->name('tip.index');
+        Route::get('/tip/create', [TipUserController::class, 'create'])->name('tip.create');
+        Route::post('/tip', [TipUserController::class, 'store'])->name('tip.store');
     });
 
 
